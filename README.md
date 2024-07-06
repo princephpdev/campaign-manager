@@ -8,12 +8,26 @@
 $ npm install
 ```
 
-## Running the app
-
+## DB Setup
 ```bash
 # db setup
 $ npx prisma init --datasource-provider sqlite
 
+# db migration
+$ npx prisma migrate dev --name init
+
+# db generate
+$ npx prisma generate
+
+# db push
+# After update schema
+$ npx prisma db push
+
+```
+
+## Running the app
+
+```bash
 # development
 $ npm run start
 

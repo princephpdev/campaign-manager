@@ -6,6 +6,7 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
 
+  app.enableCors();
   app.setGlobalPrefix('api/v1');
 
   const config = new DocumentBuilder()
