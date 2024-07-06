@@ -9,3 +9,20 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model Campaign {
+  id        Int        @id @default(autoincrement())
+  type      String
+  startDate DateTime
+  endDate   DateTime
+  schedules Schedule[]
+}
+
+model Schedule {
+  id         Int      @id @default(autoincrement())
+  dayOfWeek  String
+  startTime  String
+  endTime    String
+  campaignId Int
+  campaign   Campaign @relation(fields: [campaignId], references: [id])
+}
