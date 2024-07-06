@@ -1,4 +1,5 @@
 import { registerDecorator, ValidationOptions } from 'class-validator';
+import { InvalidScheduleDateTimeMessageError } from '../constants/custom-error-messages';
 
 const allowedSchedules = {
   Monday: [
@@ -12,8 +13,10 @@ const allowedSchedules = {
   Saturday: [{ start: '15:00', end: '19:00' }],
 };
 
-function isValidTimeRange(start: string, end: string, allowedRanges: { start: string; end: string }[]): boolean {
-  return allowedRanges.some((range) => range.start === start && range.end === end);
+function isWithinTimeRange(start: string, end: string, allowedRanges: { start: string; end: string }[]): boolean {
+  return allowedRanges.some((range) => {
+    return start >= range.start && end <= range.end;
+  });
 }
 
 export function IsValidSchedule(validationOptions?: ValidationOptions) {
@@ -30,11 +33,11 @@ export function IsValidSchedule(validationOptions?: ValidationOptions) {
             if (!allowedRanges) {
               return false;
             }
-            return isValidTimeRange(schedule.startTime, schedule.endTime, allowedRanges);
+            return isWithinTimeRange(schedule.startTime, schedule.endTime, allowedRanges);
           });
         },
         defaultMessage() {
-          return `Invalid schedule. Allowed schedules are: ${JSON.stringify(allowedSchedules)}`;
+          return InvalidScheduleDateTimeMessageError;
         },
       },
     });

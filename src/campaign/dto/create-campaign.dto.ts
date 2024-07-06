@@ -6,6 +6,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -19,20 +20,36 @@ enum CampaignType {
   BuyOneGetOne = 'Buy One Get One',
 }
 
+enum DayOfWeek {
+  MONDAY = 'Monday',
+  TUESDAY = 'Tuesday',
+  WEDNESDAY = 'Wednesday',
+  THURSDAY = 'Thursday',
+  FRIDAY = 'Friday',
+  SATURDAY = 'Saturday',
+  SUNDAY = 'Sunday',
+}
+
 class ScheduleDto {
   @ApiProperty()
   @IsNotEmpty()
-  @IsString()
-  dayOfWeek: string;
+  @IsEnum(DayOfWeek)
+  dayOfWeek: DayOfWeek;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
+  @Matches(/^([0-1]\d|2[0-3]):([0-5]\d)$/, {
+    message: 'startTime must be in the format HH:mm',
+  })
   startTime: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
+  @Matches(/^([0-1]\d|2[0-3]):([0-5]\d)$/, {
+    message: 'endTime must be in the format HH:mm',
+  })
   endTime: string;
 }
 
@@ -41,13 +58,13 @@ export class CreateCampaignDto {
   @IsEnum(CampaignType)
   type: CampaignType;
 
-  @ApiProperty({ type: Date })
+  @ApiProperty()
   @IsDateString()
-  startDate: Date;
+  startDate: string;
 
-  @ApiProperty({ type: Date })
+  @ApiProperty()
   @IsDateString()
-  endDate: Date;
+  endDate: string;
 
   @ApiProperty({ type: ScheduleDto, isArray: true })
   @IsArray()
@@ -66,13 +83,13 @@ export class FilterCampaignDto {
   @IsEnum(CampaignType)
   type?: CampaignType;
 
-  @ApiProperty({ type: Date, required: false })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsDateString()
-  startDate?: Date;
+  startDate?: string;
 
-  @ApiProperty({ type: Date, required: false })
+  @ApiProperty({ required: false })
   @IsOptional()
   @IsDateString()
-  endDate?: Date;
+  endDate?: string;
 }
