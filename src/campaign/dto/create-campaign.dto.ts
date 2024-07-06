@@ -10,6 +10,8 @@ import {
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsValidSchedule } from 'src/common/decorators/is-valid-schedule.decorator';
+import { InvalidScheduleDateTimeMessageError } from 'src/common/constants/custom-error-messages';
 
 enum CampaignType {
   CostPerOrder = 'Cost per Order',
@@ -47,11 +49,14 @@ export class CreateCampaignDto {
   @IsDateString()
   endDate: Date;
 
-  @ApiProperty({ type: ScheduleDto })
+  @ApiProperty({ type: ScheduleDto, isArray: true })
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => ScheduleDto)
+  @IsValidSchedule({
+    message: InvalidScheduleDateTimeMessageError,
+  })
   schedules: ScheduleDto[];
 }
 
