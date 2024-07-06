@@ -1,7 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import { ApiTags, ApiQuery } from '@nestjs/swagger';
 import { CampaignService } from './campaign.service';
-import { CreateCampaignDto } from './dto/create-campaign.dto';
+import { CreateCampaignDto, FilterCampaignDto } from './dto/create-campaign.dto';
 
 @ApiTags('campaigns')
 @Controller('campaigns')
@@ -14,8 +14,13 @@ export class CampaignController {
   }
 
   @Get()
-  findAll() {
-    return this.campaignService.findAll();
+  @ApiQuery({ name: 'type', required: false })
+  @ApiQuery({ name: 'startDate', required: false })
+  @ApiQuery({ name: 'endDate', required: false })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  findAll(@Query() filters: FilterCampaignDto, @Query('page') page = 1, @Query('pageSize') pageSize = 10) {
+    return this.campaignService.findAll(filters, +page, +pageSize);
   }
 
   @Get(':id')

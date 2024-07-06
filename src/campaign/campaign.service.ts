@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { CreateCampaignDto } from './dto/create-campaign.dto';
+import { CreateCampaignDto, FilterCampaignDto } from './dto/create-campaign.dto';
 
 @Injectable()
 export class CampaignService {
@@ -18,10 +18,23 @@ export class CampaignService {
     });
   }
 
-  async findAll() {
-    return this.prisma.campaign.findMany({
-      include: { schedules: true },
-    });
+  async findAll(filters: FilterCampaignDto, page: number, pageSize: number) {
+    const where = {};
+    if (filters.type) where['type'] = filters.type;
+    if (filters.startDate) where['startDate'] = { gte: filters.startDate };
+    if (filters.endDate) where['endDate'] = { lte: filters.endDate };
+
+    const [total, campaigns] = await this.prisma.$transaction([
+      this.prisma.campaign.count({ where }),
+      this.prisma.campaign.findMany({
+        where,
+        include: { schedules: true },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+    ]);
+
+    return { total, campaigns };
   }
 
   async findOne(id: number) {
